@@ -4,7 +4,14 @@ namespace Q.Router {
     let resolving: number = 0;
     let autoinc: number = 0;
     let listenerTimeout: number;
+    let ignoreHash: number = 0;
+    let ignoreTime: number = 0;
+
     export let enabled: boolean = true;
+
+    function isEqual(url1: string, url2: string) {
+        return url1 == url2 || url1 == url2 + '#' || url2 == url1 + '#';
+    }
 
     export function navigate(hash: string, tryBack?: boolean, silent?: boolean) {
         if (!enabled || resolving > 0)
@@ -16,18 +23,20 @@ namespace Q.Router {
         var newURL = window.location.href.replace(/#$/, '')
             .replace(/#.*$/, '') + hash;
         if (newURL != window.location.href) {
-            if (tryBack && (oldURL == newURL ||
-                oldURL == newURL + '#' ||
-                oldURL + '#' == newURL)) {
+            if (tryBack && oldURL != null && isEqual(oldURL, newURL)) {
                 if (silent)
                     ignoreChange();
+
+                var prior = window.location.href;
+                oldURL = null;
                 window.history.back();
-                if (window.location.href == oldURL)
-                    return;
+                return;
             }
 
             if (silent)
                 ignoreChange();
+
+            oldURL = window.location.href;
             window.location.hash = hash;
         }
     }
@@ -102,10 +111,13 @@ namespace Q.Router {
             element.data("qroute", null);
             element.unbind(".qrouter");
             var prhash = element.data("qprhash");
-            if (prhash)
-                replace(prhash, true);
+            var tryBack = e && e.originalEvent &&
+                ((e.originalEvent.type == "keydown" && (e.originalEvent as any).keyCode == 27) ||
+                    $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close"));
+            if (prhash != null)
+                replace(prhash, tryBack);
             else
-                replaceLast('', true);
+                replaceLast('', tryBack);
         });
     }
 
@@ -186,16 +198,21 @@ namespace Q.Router {
     }
 
     function hashChange(e: any, o: string) {
-        oldURL = (e && e.oldURL) || o;
+        if (ignoreHash > 0) {
+            if (new Date().getTime() - ignoreTime > 1000) {
+                ignoreHash = 0;
+            }
+            else {
+                ignoreHash--;
+                return;
+            }
+        }
         resolve();
     }
 
     function ignoreChange() {
-        window.clearTimeout(listenerTimeout);
-        window.removeEventListener("hashchange", hashChange as any);
-        setTimeout(function () {
-            window.addEventListener("hashchange", hashChange as any, false);
-        }, 1);
+        ignoreHash++;
+        ignoreTime = new Date().getTime();
     }
 
     window.addEventListener("hashchange", hashChange as any, false);

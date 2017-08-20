@@ -1,3 +1,27 @@
+## 2.10.3 (2017-08-17)
+
+Features:
+  - experimental functionality to use a Serenity editor as a Vue component using special <editor /> element
+  - date/datetime editor year range option default to -100:+50 instead of -10:+10 (better for birth date etc.)
+  - router use history.back() only when dialog is closed by x button or escape key
+
+## 2.10.2 (2017-08-12)
+
+Features:
+  - option to use original file name as uploaded file name with a {4} format parameter in FileNameFormat. it auto adds file (1).docx etc if there is already a file with same name on disk
+
+Bugfixes:
+  - resolve problem if router can't use history.back(), e.g. history is empty somehow
+
+## 2.10.1 (2017-08-10)
+
+Features:
+  - added option to ignore enum members (thanks @Estrusco)
+
+Bugfixes:
+  - resolve problem with Firefox / hash based router while editing items in detail editors. You may add Q.Router.enabled = false in ScriptInitialization.ts if still having issues or wan't to disable this "feature".
+  - findElementWithRelativeId missing # (thanks @Estrusco)
+
 ## 2.10.0 (2017-07-23)
 
 Features:

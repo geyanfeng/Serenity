@@ -48,3 +48,6 @@ Serenity.TypeScript.CodeGeneration/Serenity.CodeGeneration.js.map
 Serenity.TypeScript.CodeGeneration/Serenity.CodeGeneration.min.js
 .vs/
 npm-debug.log
+/.axoCover/
+Serenity.TypeScript.CoreLib/Serenity.CoreLib.js.map
+Serenity.TypeScript.CoreLib/Serenity.CoreLib.min.js
